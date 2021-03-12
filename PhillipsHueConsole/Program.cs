@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System;
 using System.Threading.Tasks;
 using test.controller;
-using test.model;
 
 namespace test {
     class Program {
@@ -15,8 +11,12 @@ namespace test {
             await controller.InitializeData(); ;
             var lights = controller.Lights;
             var groups = controller.Groups;
-            await controller.SetComponentState(groups[0], "bri", "254");
-            await controller.SetComponentState(groups[0], "on", "false");
+
+            groups.ForEach(Console.WriteLine);
+            //await controller.SetComponentState(groups[0], "bri", "120");
+            //await controller.SetComponentState(groups[0], "on", "true");
+
+
         }
     }
 }

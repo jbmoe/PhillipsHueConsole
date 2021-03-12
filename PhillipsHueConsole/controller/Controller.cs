@@ -73,7 +73,7 @@ namespace test.controller {
 
                 // initialize groups
                 string responseGroups = await HTTPGet(URL + "groups");
-                Dictionary<int, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<int, Group>>(responseGroups);
+                Dictionary<int, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<int, Group>>(responseGroups,);
                 InitializeKeyInObj(groupsIn);
                 groups = groupsIn.Values.ToList();
 
