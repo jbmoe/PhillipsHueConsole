@@ -39,13 +39,6 @@ namespace test.controller {
         }
         #endregion
 
-        /// <summary>
-        /// Sets a value for a given Hue components property
-        /// </summary>
-        /// <param name="component">The Hue component to set state for </param>
-        /// <param name="property">The property for wich to set value</param>
-        /// <param name="value">The value to set for property</param>
-        /// <returns>HttpResponseMessage response</returns>
         public async Task<HttpResponseMessage> SetComponentState(HueComponent component, string property, string value) {
             // Check which type of component
             string requestUri = "";
@@ -69,10 +62,7 @@ namespace test.controller {
             return response;
         }
         #endregion
-        #region initializer methods
-
-        
-
+        #region initializer method
         public async Task InitializeData() {
             try {
                 // initialize lights
