@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PhillipsHueConsole;
+using PhillipsHueConsole.controller;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +20,14 @@ namespace test.controller {
         }
         private Controller() { }
         #endregion
-        #region network fields
-        HttpClient client = new HttpClient();
-        string URL = "http://192.168.87.124/api/5plLWq0PmCMOrBATXB2CEBonBb3OsRHtsZK2n7FQ/";
+        #region network controller
+        NetworkController networkController = NetworkController.GetInstance();
         #endregion
         #region data fields
         private List<Light> lights;
         private List<Group> groups;
         #endregion
-        #region properties
+        #region data properties
         public List<Light> Lights {
             get { return lights; }
             set { lights = value; }
@@ -42,41 +42,31 @@ namespace test.controller {
         public async Task<HttpResponseMessage> SetComponentState(HueComponent component, string property, string value) {
             // Check which type of component
             string requestUri = "";
-            if (component is Group) requestUri = $"{URL}groups/{component.ComponentKey}/action";
-            else if (component is Light) requestUri = $"{URL}lights/{component.ComponentKey}/state";
+            if (component is Group) requestUri = $"groups/{component.ComponentKey}/action";
+            else if (component is Light) requestUri = $"lights/{component.ComponentKey}/state";
 
             // Send put request
             HttpContent content = new StringContent($"{{\"{property}\": {value}}}");
-            HttpResponseMessage response = await HTTPPut(requestUri, content);
+            HttpResponseMessage response = await networkController.Put(requestUri, content);
 
             return response;
         }
 
-        #region network methods
-        private async Task<HttpResponseMessage> HTTPPut(string url, HttpContent content) {
-            HttpResponseMessage response = await client.PutAsync(url, content);
-            return response;
-        }
-        private async Task<string> HTTPGet(string url) {
-            string response = await client.GetStringAsync(url);
-            return response;
-        }
-        #endregion
+       
         #region initializer method
         public async Task InitializeData() {
             try {
                 // initialize lights
-                string responseLights = await HTTPGet(URL + "lights");
+                string responseLights = await networkController.Get("lights");
                 Dictionary<int, Light> lightsIn = JsonConvert.DeserializeObject<Dictionary<int, Light>>(responseLights);
                 InitializeKeyInObj(lightsIn);
                 lights = lightsIn.Values.ToList();
 
                 // initialize groups
-                string responseGroups = await HTTPGet(URL + "groups");
-                Dictionary<int, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<int, Group>>(responseGroups,);
+                string responseGroups = await networkController.Get("groups");
+                Dictionary<int, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<int, Group>>(responseGroups);
                 InitializeKeyInObj(groupsIn);
                 groups = groupsIn.Values.ToList();
-
 
                 // initialize lights for groups
                 InitializeLightsInGroups(groups, lights);
@@ -91,7 +81,6 @@ namespace test.controller {
                     objs[key].ComponentKey = key;
                 }
             }
-
             void InitializeLightsInGroups(List<Group> groups, List<Light> lights) {
                 foreach (Group group in groups) {
                     List<Light> newLights = new();
