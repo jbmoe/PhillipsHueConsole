@@ -1,12 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using test.model;
-
-namespace PhillipsHueConsole.model {
+﻿namespace PhillipsHueConsole.model {
     public class LightState {
         public HueComponent Component { get; set; }
 

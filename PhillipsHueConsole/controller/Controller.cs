@@ -1,14 +1,12 @@
 ﻿using Newtonsoft.Json;
-using PhillipsHueConsole;
-using PhillipsHueConsole.controller;
+using PhillipsHueConsole.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using test.model;
 
-namespace test.controller {
+namespace PhillipsHueConsole.controller {
     class Controller {
         #region singleton
         private static Controller _instance;
@@ -26,17 +24,14 @@ namespace test.controller {
         #region data fields
         private List<Light> lights;
         private List<Group> groups;
+        private List<Schedule> schedules;
+        private List<Scene> scenes;
         #endregion
         #region data properties
-        public List<Light> Lights {
-            get { return lights; }
-            set { lights = value; }
-        }
-
-        public List<Group> Groups {
-            get { return groups; }
-            set { groups = value; }
-        }
+        public List<Light> Lights { get { return lights; } }
+        public List<Group> Groups { get { return groups; } }
+        public List<Schedule> Schedules { get { return schedules; } }
+        public List<Scene> Scenes { get { return scenes; } }
         #endregion
 
         public async Task<HttpResponseMessage> SetComponentState(HueComponent component, string property, string value) {
@@ -64,37 +59,50 @@ namespace test.controller {
             try {
                 // initialize lights
                 string responseLights = await networkController.Get("lights");
-                Dictionary<int, Light> lightsIn = JsonConvert.DeserializeObject<Dictionary<int, Light>>(responseLights);
+                Dictionary<string, Light> lightsIn = JsonConvert.DeserializeObject<Dictionary<string, Light>>(responseLights);
                 InitializeKeyInObj(lightsIn);
                 lights = lightsIn.Values.ToList();
 
                 // initialize groups
                 string responseGroups = await networkController.Get("groups");
-                Dictionary<int, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<int, Group>>(responseGroups);
+                Dictionary<string, Group> groupsIn = JsonConvert.DeserializeObject<Dictionary<string, Group>>(responseGroups);
                 InitializeKeyInObj(groupsIn);
                 groups = groupsIn.Values.ToList();
 
-                // initialize lights for groups
-                InitializeLightsInGroups(groups, lights);
+                // initialize schedules
+                string responseSchedules = await networkController.Get("schedules");
+                Dictionary<string, Schedule> schedulesIn = JsonConvert.DeserializeObject<Dictionary<string, Schedule>>(responseSchedules);
+                InitializeKeyInObj(schedulesIn);
+                schedules = schedulesIn.Values.ToList();
+
+                // initialize scenes
+                string responseScenes = await networkController.Get("scenes");
+                Dictionary<string, Scene> scenesIn = JsonConvert.DeserializeObject<Dictionary<string, Scene>>(responseScenes);
+                InitializeKeyInObj(scenesIn);
+                scenes = scenesIn.Values.ToList();
+
+                // initialize lights for groups and scenes
+                InitializeLights(groups, lights);
+                InitializeLights(scenes, lights);
 
             } catch (HttpRequestException e) {
                 Console.WriteLine("\nException Caught!");
                 Console.WriteLine("Message :{0} ", e.Message);
             }
 
-            void InitializeKeyInObj<T>(Dictionary<int, T> objs) where T : HueComponent {
-                foreach (int key in objs.Keys) {
-                    objs[key].Key = key.ToString();
+            void InitializeKeyInObj<T>(Dictionary<string, T> objs) where T : HueComponent {
+                foreach (string key in objs.Keys) {
+                    objs[key].Key = key;
                 }
             }
-            void InitializeLightsInGroups(List<Group> groups, List<Light> lights) {
-                foreach (Group group in groups) {
+            void InitializeLights<T>(List<T> components, List<Light> lights) where T : IHasLights {
+                foreach (T component in components) {
                     List<Light> newLights = new();
-                    foreach (int i in group.LightKeys) {
-                        Light toAdd = lights.Find(e => Convert.ToInt32(e.Key) == i);
+                    foreach (string i in component.lightKeys) {
+                        Light toAdd = lights.Find(e => e.Key.Equals(i));
                         newLights.Add(toAdd);
                     }
-                    group.Lights = newLights;
+                    component.Lights = newLights;
                 }
             }
         }

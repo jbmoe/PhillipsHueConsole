@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhillipsHueConsole {
+﻿namespace PhillipsHueConsole.model {
     public abstract class HueComponent {
         public abstract string Key { get; set; }
         public abstract string Name { get; set; }

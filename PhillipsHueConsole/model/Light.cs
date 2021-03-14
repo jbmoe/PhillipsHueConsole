@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using PhillipsHueConsole;
-using PhillipsHueConsole.model;
-using System;
 
-namespace test.model {
+namespace PhillipsHueConsole.model {
     public class Light : HueComponent {
         public override string Key { get; set; }
         public override string Name { get; set; }
