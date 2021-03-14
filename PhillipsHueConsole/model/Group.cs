@@ -1,17 +1,12 @@
 ﻿using Newtonsoft.Json;
-using PhillipsHueConsole;
-using PhillipsHueConsole.model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace test.model {
-    class Group : HueComponent {
+
+namespace PhillipsHueConsole.model {
+    class Group : HueComponent, IHasLights {
         public override string Key { get; set; }
         public override string Name { get; set; }
-        public int[] LightKeys;
+        public string[] lightKeys { get; set; }
         public List<Light> Lights { get; set; }
         public string Type { get; set; }
         private LightState action;
@@ -19,10 +14,10 @@ namespace test.model {
         public string Class { get; set; }
 
         [JsonConstructor]
-        public Group(string name, int[] lights, string type, string Class, bool on, int bri, int hue, int sat, string effect, double[] xy) : base(name) {
+        public Group(string name, string[] lights, string type, string Class, bool on, int bri, int hue, int sat, string effect, double[] xy) : base(name) {
             LightState action = InitAction(on, bri, hue, sat, effect, xy);
             this.action = action;
-            LightKeys = lights;
+            lightKeys = lights;
             Type = type;
             this.Class = Class;
         }
