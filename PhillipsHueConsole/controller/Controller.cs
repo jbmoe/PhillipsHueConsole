@@ -85,6 +85,9 @@ namespace PhillipsHueConsole.controller {
                 InitializeLights(groups, lights);
                 InitializeLights(scenes, lights);
 
+                // initialize group for scenes
+                InitializeGroupinScenes(groups, scenes);
+
             } catch (HttpRequestException e) {
                 Console.WriteLine("\nException Caught!");
                 Console.WriteLine("Message :{0} ", e.Message);
@@ -99,10 +102,16 @@ namespace PhillipsHueConsole.controller {
                 foreach (T component in components) {
                     List<Light> newLights = new();
                     foreach (string i in component.lightKeys) {
-                        Light toAdd = lights.Find(e => e.Key.Equals(i));
+                        Light toAdd = lights.Find(e => e.Key == i);
                         newLights.Add(toAdd);
                     }
                     component.Lights = newLights;
+                }
+            }
+            void InitializeGroupinScenes(List<Group> groups, List<Scene> scenes) {
+                foreach (var scene in scenes) {
+                    var group = groups.Find(e => e.Key == scene.groupKey);
+                    scene.Group = group;
                 }
             }
         }
