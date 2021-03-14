@@ -12,10 +12,13 @@ namespace test {
             var lights = controller.Lights;
             var groups = controller.Groups;
 
-            groups.ForEach(Console.WriteLine);
+            lights.ForEach(e => Console.WriteLine(e.State.Component));
+            groups.ForEach(e => Console.WriteLine(e.Lights));
+
+            //groups.ForEach(Console.WriteLine);
 
             //await controller.SetComponentState(groups[0], "bri", "120");
-            await controller.SetComponentState(groups[0], "on", "true");
+            //await controller.SetComponentState(groups[0], "on", "true");
 
 
         }

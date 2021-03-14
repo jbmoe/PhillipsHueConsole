@@ -42,8 +42,14 @@ namespace test.controller {
         public async Task<HttpResponseMessage> SetComponentState(HueComponent component, string property, string value) {
             // Check which type of component
             string requestUri = "";
-            if (component is Group) requestUri = $"groups/{component.ComponentKey}/action";
-            else if (component is Light) requestUri = $"lights/{component.ComponentKey}/state";
+            switch (component) {
+                case Light:
+                    requestUri = $"lights/{component.Key}/state";
+                    break;
+                case Group:
+                    requestUri = $"groups/{component.Key}/action";
+                    break;
+            }
 
             // Send put request
             HttpContent content = new StringContent($"{{\"{property}\": {value}}}");
@@ -52,7 +58,7 @@ namespace test.controller {
             return response;
         }
 
-       
+
         #region initializer method
         public async Task InitializeData() {
             try {
@@ -75,17 +81,17 @@ namespace test.controller {
                 Console.WriteLine("\nException Caught!");
                 Console.WriteLine("Message :{0} ", e.Message);
             }
-            
+
             void InitializeKeyInObj<T>(Dictionary<int, T> objs) where T : HueComponent {
                 foreach (int key in objs.Keys) {
-                    objs[key].ComponentKey = key;
+                    objs[key].Key = key.ToString();
                 }
             }
             void InitializeLightsInGroups(List<Group> groups, List<Light> lights) {
                 foreach (Group group in groups) {
                     List<Light> newLights = new();
                     foreach (int i in group.LightKeys) {
-                        Light toAdd = lights.Find(e => e.ComponentKey == i);
+                        Light toAdd = lights.Find(e => Convert.ToInt32(e.Key) == i);
                         newLights.Add(toAdd);
                     }
                     group.Lights = newLights;
