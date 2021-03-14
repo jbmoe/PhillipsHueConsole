@@ -20,8 +20,8 @@ namespace test.model {
         public string Class { get; set; }
         #endregion
         public override string ToString() {
-            string toReturn = $"{ComponentKey}: {Name}\n";
-            Lights.ForEach(e => toReturn += e.ToString() + "\n");
+            string toReturn = $"{ComponentKey}: {Name} - {Lights.Count} lights";
+            //Lights.ForEach(e => toReturn += e.ToString() + "\n");
             return toReturn.TrimEnd();
         }
 

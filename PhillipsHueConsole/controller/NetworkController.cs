@@ -21,7 +21,6 @@ namespace PhillipsHueConsole.controller {
         HttpClient client = new HttpClient();
         const string URL = "http://192.168.87.124/api/5plLWq0PmCMOrBATXB2CEBonBb3OsRHtsZK2n7FQ/";
         #endregion
-
         #region network methods
         public async Task<HttpResponseMessage> Put(string url, HttpContent content) {
             HttpResponseMessage response = await client.PutAsync(URL + url, content);
