@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace PhillipsHueConsole {
     public abstract class HueComponent {
-        public abstract int ComponentKey { get; set; }
+        public abstract string Key { get; set; }
+        public abstract string Name { get; set; }
+
+        public override string ToString() {
+            return $"{Key}: {Name}";
+        }
     }
 }
