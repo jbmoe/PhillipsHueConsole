@@ -20,6 +20,10 @@ namespace PhillipsHueConsole.controller {
         #region network methods
         public async Task<HttpResponseMessage> Put(string url, HttpContent content) {
             HttpResponseMessage response = await client.PutAsync(URL + url, content);
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            if (responseContent.Contains("error")) throw new HttpRequestException("Fejl i request:\n" + responseContent);
+
             return response;
         }
         public async Task<string> Get(string url) {
