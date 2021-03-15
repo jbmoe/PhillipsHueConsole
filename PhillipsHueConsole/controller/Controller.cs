@@ -26,24 +26,31 @@ namespace PhillipsHueConsole.controller {
         private List<Group> groups;
         private List<Schedule> schedules;
         private List<Scene> scenes;
+        private List<Sensor> sensors;
         #endregion
         #region data properties
         public List<Light> Lights { get { return lights; } }
         public List<Group> Groups { get { return groups; } }
         public List<Schedule> Schedules { get { return schedules; } }
         public List<Scene> Scenes { get { return scenes; } }
+        public List<Sensor> Sensors { get { return sensors; } }
         #endregion
+
+        public async Task<HttpResponseMessage> SetScheduleAction(Schedule schedule, bool on) {
+            string requestUri = $"schedules/{schedule.Key}";
+            HttpContent content = new StringContent($"{{\"status\": \"{(on ? "enabled" : "disabled")}\"}}");
+
+            HttpResponseMessage response = await networkController.Put(requestUri, content);
+
+            return response;
+        }
 
         public async Task<HttpResponseMessage> SetComponentState(HueComponent component, string property, string value) {
             // Check which type of component
             string requestUri = "";
             switch (component) {
-                case Light:
-                    requestUri = $"lights/{component.Key}/state";
-                    break;
-                case Group:
-                    requestUri = $"groups/{component.Key}/action";
-                    break;
+                case Light: requestUri = $"lights/{component.Key}/state"; break;
+                case Group: requestUri = $"groups/{component.Key}/action"; break;
             }
 
             // Send put request
@@ -80,6 +87,12 @@ namespace PhillipsHueConsole.controller {
                 Dictionary<string, Scene> scenesIn = JsonConvert.DeserializeObject<Dictionary<string, Scene>>(responseScenes);
                 InitializeKeyInObj(scenesIn);
                 scenes = scenesIn.Values.ToList();
+
+                // initialize scenes
+                string responseSensors = await networkController.Get("sensors");
+                Dictionary<string, Sensor> sensorsIn = JsonConvert.DeserializeObject<Dictionary<string, Sensor>>(responseSensors);
+                InitializeKeyInObj(sensorsIn);
+                sensors = sensorsIn.Values.ToList();
 
                 // initialize lights for groups and scenes
                 InitializeLights(groups, lights);
